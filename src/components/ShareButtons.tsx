@@ -121,10 +121,10 @@ export default function ShareButtons({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <button
             onClick={handleTwitterShare}
-            className="flex items-center justify-center space-x-2 bg-[#1da1f2] hover:bg-[#1a8cd8] text-white py-3 px-6 rounded-lg transition-colors"
+            className="flex items-center justify-center space-x-2 bg-black hover:bg-gray-800 text-white py-3 px-6 rounded-lg transition-colors"
           >
             <span>𝕏</span>
-            <span>Twitter</span>
+            <span>X (Twitter)</span>
           </button>
 
           <button
