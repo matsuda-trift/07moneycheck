@@ -5,12 +5,11 @@
 
 "use client";
 
-import Link from 'next/link'
 import { useData } from '@/contexts/DataContext'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 
-export default function Home() {
+function HomeContent() {
   const { clearUserData } = useData();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,5 +85,13 @@ export default function Home() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   )
 }
