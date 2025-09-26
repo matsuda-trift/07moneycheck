@@ -27,7 +27,7 @@ export default function PremiumResultPage() {
     const urlParams = new URLSearchParams(window.location.search)
     const sessionId = urlParams.get('session_id')
 
-    const savedData = localStorage.getItem('moneyCheckData')
+    const savedData = localStorage.getItem('moneycheck-session')
 
     // Stripe決済完了の場合
     if (sessionId) {
@@ -295,7 +295,6 @@ export default function PremiumResultPage() {
             <button
               onClick={() => {
                 clearUserData() // DataContextを使用してデータをクリア
-                localStorage.removeItem('moneyCheckData')
                 localStorage.removeItem('moneyCheckPremium')
                 router.push('/input')
               }}
