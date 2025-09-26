@@ -29,15 +29,54 @@ export default function PremiumResultPage() {
 
     const savedData = localStorage.getItem('moneyCheckData')
 
-    // データ存在チェック
-    if (!savedData) {
-      router.push('/input')
-      return
-    }
-
     // Stripe決済完了の場合
     if (sessionId) {
-      // セッションIDを検証し、決済状況を確認
+      // データ存在チェック - 決済完了時はセッションメタデータから復元
+      if (!savedData) {
+        // セッションメタデータからスコア情報を取得してデータを復元
+        fetch(`/api/create-checkout-session?session_id=${sessionId}`)
+          .then(response => response.json())
+          .then(sessionData => {
+            if (sessionData.payment_status === 'paid' && sessionData.metadata) {
+              // メタデータから基本情報を復元（簡易版）
+              const restoredData = {
+                mainIncome: 0,
+                sideIncome: 0,
+                investment: 0,
+                consumption: 0,
+                waste: 0,
+                savings: 0,
+                stockIncome: 0,
+                creditPayment: 0,
+                subscription: 0,
+                totalScore: parseInt(sessionData.metadata.totalScore),
+                rank: sessionData.metadata.rank
+              }
+
+              // プレミアムアクセス権を付与（24時間有効）
+              const expiryTime = Date.now() + (24 * 60 * 60 * 1000)
+              localStorage.setItem('moneyCheckPremium', 'true')
+              localStorage.setItem('moneyCheckPremiumExpiry', expiryTime.toString())
+              localStorage.removeItem('moneyCheckPending')
+
+              // エラーメッセージを表示
+              alert('決済は完了しましたが、診断データが見つかりません。再度診断を行ってください。')
+              router.push('/input')
+              return
+            } else {
+              console.error('Payment not completed:', sessionData)
+              router.push('/premium')
+              return
+            }
+          })
+          .catch(error => {
+            console.error('Session validation error:', error)
+            router.push('/premium')
+            return
+          })
+        return
+      }
+      // データが存在する場合のセッション検証
       fetch(`/api/create-checkout-session?session_id=${sessionId}`)
         .then(response => response.json())
         .then(sessionData => {
@@ -60,6 +99,11 @@ export default function PremiumResultPage() {
           return
         })
     } else {
+      // データ存在チェック（通常アクセス時のみ）
+      if (!savedData) {
+        router.push('/input')
+        return
+      }
       // 通常のアクセス - プレミアム権限チェック
       const hasPremium = localStorage.getItem('moneyCheckPremium')
       const premiumExpiry = localStorage.getItem('moneyCheckPremiumExpiry')
